@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE logback>
+<configuration>
+	<include resource="org\springframework\boot\logging\logback\base.xml" />
+	<timestamp key="bySecond" datePattern="yyyyMMddHHmmss" />
+	<timestamp key="byDay" datePattern="yyyyMMdd" />
+	<springProfile name="pt">
+		<property name="logname" value=".log" />
+		<property name="logpath" value="/usr/local/jboss/khsnRirekiBatch/logs/" />
+		<property name="logfilename" value="pt-app" />
+		<property name="accessLogfilename" value="pt-app-access" />
+		<!--ログレベル -->
+		<property name="LOG_LEVEL" value="DEBUG" />
+		<!--log4jdbc-log4j2 -->
+		<logger name="jdbc.sqltiming" level="DEBUG" />
+		<logger name="jdbc.resultsettable" level="DEBUG" />
+		<logger name="jdbc.connection" level="DEBUG" />
+	</springProfile>
+	<springProfile name="dev">
+		<property name="logname" value=".log" />
+		<property name="logpath" value="/home/apladmin/khsnRirekiBatch/logs/" />
+		<property name="logfilename" value="app" />
+		<property name="accessLogfilename" value="app-access" />
+		<!--ログレベル -->
+		<property name="LOG_LEVEL" value="INFO" />
+		<!--log4jdbc-log4j2 -->
+		<logger name="jdbc.sqltiming" level="ERROR" />
+		<logger name="jdbc.resultsettable" level="ERROR" />
+		<logger name="jdbc.connection" level="ERROR" />
+	</springProfile>
+	<springProfile name="prod">
+		<property name="logname" value=".log" />
+		<property name="logpath" value="/home/apladmin/khsnRirekiBatch/logs/" />
+		<property name="logfilename" value="app" />
+		<property name="accessLogfilename" value="app-access" />
+		<!--ログレベル -->
+		<property name="LOG_LEVEL" value="INFO" />
+		<!--log4jdbc-log4j2 -->
+		<logger name="jdbc.sqltiming" level="ERROR" />
+		<logger name="jdbc.resultsettable" level="ERROR" />
+		<logger name="jdbc.connection" level="ERROR" />
+	</springProfile>
+
+  <!-- ログ名 -->
+  <property name="CUSTOMER_HISTORIES_API_log" value="_customer-histories-api" />
+  <property name="TGCARSCOM_API_021_log" value="_tg-cars-com-api-021" />
+  <property name="CIRIUS_API_PIPELINE_CUSTOMER_NUMBER_RELATION_log" value="_cirius-api-pipeline-customer-number-relation" />
+  <property name="KHSN_log" value="_khsn" />
+  <property name="PIPELINE_log" value="_pipeline" />
+
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<charset>utf-8</charset>
+			<Pattern>%d{HH:mm:ss.SSS} [%thread] [%level] %logger{0} - %msg \(%file:%line\)%n</Pattern>
+		</encoder>
+	</appender>
+<!--
+	<appender name="ACCESS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${logpath}${accessLogfilename}${logname}</file>
+		<append>true</append>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logpath}${accessLogfilename}${logname}.%d{yyyy-MM-W}.gz</fileNamePattern>
+			<maxHistory>60</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level [%thread] - %msg%n</pattern>
+		</encoder>
+	</appender>
+-->
+	<appender name="APP_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${logpath}${logfilename}${logname}</file>
+		<append>true</append>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logpath}${logfilename}${logname}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+			<maxHistory>60</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] - %msg%n</pattern>
+		</encoder>
+	</appender>
+<!--
+	<logger name="jp.co.gas.tokyo.tgcarskhk.handlers.AccessLoggingHandlerInterceptor" additivity="false">
+		<level value="OFF" />
+		<appender-ref ref="ACCESS_LOG" />
+	</logger>
+-->
+
+<appender name="CUSTOMER_HISTORIES_API" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <file>${logpath}${logfilename}${CUSTOMER_HISTORIES_API_log}${logname}</file>
+  <append>true</append>
+  <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    <fileNamePattern>${logpath}${logfilename}${CUSTOMER_HISTORIES_API_log}${logname}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+    <maxHistory>60</maxHistory>
+  </rollingPolicy>
+  <encoder>
+    <charset>UTF-8</charset>
+    <pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] %logger{0} - %msg%n</pattern>
+  </encoder>
+</appender>
+
+<appender name="TGCARSCOM_API_021" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<file>${logpath}${logfilename}${TGCARSCOM_API_021_log}${logname}</file>
+	<append>true</append>
+	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	  <fileNamePattern>${logpath}${logfilename}${TGCARSCOM_API_021_log}${logname}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+	  <maxHistory>60</maxHistory>
+	</rollingPolicy>
+	<encoder>
+	  <charset>UTF-8</charset>
+	  <pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] %logger{0} - %msg%n</pattern>
+	</encoder>
+</appender>
+
+<appender name="CIRIUS_API_PIPELINE_CUSTOMER_NUMBER_RELATION" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<file>${logpath}${logfilename}${CIRIUS_API_PIPELINE_CUSTOMER_NUMBER_RELATION_log}${logname}</file>
+	<append>true</append>
+	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	  <fileNamePattern>${logpath}${logfilename}${CIRIUS_API_PIPELINE_CUSTOMER_NUMBER_RELATION_log}${logname}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+	  <maxHistory>60</maxHistory>
+	</rollingPolicy>
+	<encoder>
+	  <charset>UTF-8</charset>
+	  <pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] %logger{0} - %msg%n</pattern>
+	</encoder>
+</appender>
+
+<appender name="KHSN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <file>${logpath}${logfilename}${KHSN_log}${logname}</file>
+  <append>true</append>
+  <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    <fileNamePattern>${logpath}${logfilename}${KHSN_log}${logname}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+    <maxHistory>60</maxHistory>
+  </rollingPolicy>
+  <encoder>
+    <charset>UTF-8</charset>
+    <pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] %logger{0} - %msg%n</pattern>
+  </encoder>
+</appender>
+
+<appender name="PIPELINE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<file>${logpath}${logfilename}${PIPELINE_log}${logname}</file>
+	<append>true</append>
+	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	  <fileNamePattern>${logpath}${logfilename}${PIPELINE_log}${logname}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+	  <maxHistory>60</maxHistory>
+	</rollingPolicy>
+	<encoder>
+	  <charset>UTF-8</charset>
+	  <pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] %logger{0} - %msg%n</pattern>
+	</encoder>
+</appender>
+
+	<root level="${LOG_LEVEL}">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="APP_LOG" />
+	</root>
+
+  <!-- 共通サービス設定 -->
+
+  <logger name="jp.co.gas.tokyo.accessLogBatch.PdfHkkLogCreateBatch" level="${LOG_LEVEL}" >
+		<appender-ref ref="APP_LOG" />
+  </logger>
+
+	<!-- spring boot と apache のログ -->
+	<logger name="org.springframework" level="ERROR">
+		<appender-ref ref="APP_LOG" />
+  </logger>
+	<logger name="org.apache.catalina" level="ERROR">
+		<appender-ref ref="APP_LOG" />
+  </logger>
+
+	<!--共通log4jdbc-log4j2 -->
+	<logger name="jdbc" level="OFF" />
+	<logger name="jdbc.sqlonly" level="OFF" />
+	<logger name="jdbc.resultset" level="OFF" />
+	<logger name="jdbc.audit" level="OFF" />
+
+	<!-- nz.net.ultraq.thymeleaf のログ -->
+	<logger name="org.thymeleaf" level="ERROR" />
+	<logger name="nz.net.ultraq.thymeleaf" level="ERROR" />
+
+</configuration>

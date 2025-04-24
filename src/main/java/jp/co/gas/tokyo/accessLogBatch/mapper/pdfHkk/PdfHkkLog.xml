@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.gas.tokyo.accessLogBatch.mapper.pdfHkk.PdfHkkLogMapper">
+
+    <select id="selectPdfHkkList" resultType="jp.co.gas.tokyo.accessLogBatch.entity.PdfHkkLogData">
+
+		SELECT
+            p.MTMR_NO mtmrNo,
+            m.uktk_no uktkNo,
+            m.MTMR_NM mtmrNm,
+            m.TNT_NM tntNm,
+            p.REC_REG_USER_ID recRegUserId,
+            p.REC_REG_YMD recRegYmd,
+            p.REC_REG_JKK recRegJkk
+        FROM
+            PDF_HKK_LOG p
+        INNER JOIN MTMR m
+            ON p.MTMR_NO = m.MTMR_NO
+        INNER JOIN DW_APPLICATION_COM cm
+            ON m.uktk_no = cm.uktk_no
+        WHERE p.LINKED_FLG = 0
+
+	</select>
+
+</mapper>
