@@ -6,7 +6,7 @@
 
 	<groupId>jp.co.gas.tokyo.accessLogBatch</groupId>
 	<artifactId>dw-accessLog-batch</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.0</version>
 
 	<name>accessLogBatch</name>
 	<description>Demo project for Spring Boot</description>
@@ -96,6 +96,11 @@
 			<artifactId>terasoluna-gfw-string</artifactId>
 			<version>5.6.0.RC1</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>3.8.0</version>
+		  </dependency>
 	</dependencies>
 
 	<build>

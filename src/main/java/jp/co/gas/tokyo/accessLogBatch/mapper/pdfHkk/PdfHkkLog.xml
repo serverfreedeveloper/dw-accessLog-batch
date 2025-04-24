@@ -7,20 +7,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectPdfHkkList" resultType="jp.co.gas.tokyo.accessLogBatch.entity.PdfHkkLogData">
 
 		SELECT
-            p.MTMR_NO mtmrNo,
-            m.uktk_no uktkNo,
-            m.MTMR_NM mtmrNm,
-            m.TNT_NM tntNm,
+            p.PDF_TYPE pdfType,
+            p.REMOTE_ADDRESS_IP remoteAddressIp,
             p.REC_REG_USER_ID recRegUserId,
+            p.REC_REG_USER_NM recRegUserNm,
+            p.REC_REG_USER_NM recRegUserNm,
+            p.REC_REG_CORP_NM recRegCorpNm,
             p.REC_REG_YMD recRegYmd,
-            p.REC_REG_JKK recRegJkk
+            p.REC_REG_JKK recRegJkk,
+            d.CUST_INFO_CUST_NO custInfoCustNo,
+            d.CUST_INFO_NAME_SEI custInfoNameSei,
+            d.CUST_INFO_NAME_MEI custInfoNameMei,
+            d.CUST_INFO_NAME_SEI_KN custInfoNameSeiKn,
+            d.CUST_INFO_NAME_MEI_KN custInfoNameMeiKn
         FROM
             PDF_HKK_LOG p
         INNER JOIN MTMR m
             ON p.MTMR_NO = m.MTMR_NO
-        INNER JOIN DW_APPLICATION_COM cm
-            ON m.uktk_no = cm.uktk_no
-        WHERE p.LINKED_FLG = 0
+        INNER JOIN DW_APPLICATION_DETAIL d
+            ON m.uktk_no = d.uktk_no
+        WHERE 
+            p.LINKED_FLG = 0
+        ORDER BY
+            p.REC_REG_USER_ID,
+            p.REC_REG_YMD,
+            p.REC_REG_JKK
+        LIMIT 1
 
 	</select>
 

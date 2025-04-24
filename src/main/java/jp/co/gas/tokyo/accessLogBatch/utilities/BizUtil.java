@@ -41,7 +41,7 @@ public class BizUtil {
 
 		// フォーマットが指定されている場合は変換し
 		// 指定されていない場合はブランクを返却する
-		if (date != null && !StringUtil.isNullEmpty(formatStr)) {
+		if (date != null && !StringUtils.isNullEmpty(formatStr)) {
 
 			SimpleDateFormat sdf = new SimpleDateFormat(formatStr);
 			newFormatDate = sdf.format(date);
@@ -64,8 +64,8 @@ public class BizUtil {
 		// フォーマットが指定されている場合は変換し
 		// 指定されていない場合はブランクを返却する
 		if (strDate != null
-				&& !StringUtil.isNullEmpty(beforeFormatStr)
-				&& !StringUtil.isNullEmpty(afterFormatStr)) {
+				&& !StringUtils.isNullEmpty(beforeFormatStr)
+				&& !StringUtils.isNullEmpty(afterFormatStr)) {
 
 			// Date型へ変換を行う
 			SimpleDateFormat sdf = new SimpleDateFormat(beforeFormatStr);

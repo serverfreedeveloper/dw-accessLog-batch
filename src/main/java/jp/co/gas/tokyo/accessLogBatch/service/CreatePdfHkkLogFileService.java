@@ -1,100 +1,406 @@
 package jp.co.gas.tokyo.accessLogBatch.service;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.file.Paths;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jp.co.gas.tokyo.accessLogBatch.entity.PdfHkkLogData;
 import jp.co.gas.tokyo.accessLogBatch.mapper.pdfHkk.PdfHkkLogMapper;
 import jp.co.gas.tokyo.accessLogBatch.utilities.Const;
-import jp.co.gas.tokyo.accessLogBatch.utilities.FileUtil;
-import jp.co.gas.tokyo.accessLogBatch.utilities.StringUtil;
+import jp.co.gas.tokyo.accessLogBatch.utilities.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class CreatePdfHkkLogFileService {
+
+    @Value("${ALSS_EXECUTE}")
+    private String ALSS_EXECUTE;
+
+    @Value("${ALSS_SEND_FILE_DIR}")
+    private String ALSS_SEND_FILE_DIR;
+
+    @Value("${ALSS_FAIL_FILE_DIR}")
+    private String ALSS_FAIL_FILE_DIR;
+
+    @Value("${ALSS_BUSINESS_SYSTEM_CODE}")
+    private String ALSS_BUSINESS_SYSTEM_CODE;
+
+    @Value("${ALSS_FUNCTION_CODE}")
+    private String ALSS_FUNCTION_CODE;
+
+    @Value("${ALSS_LOG_DIRECTORY}")
+    private String ALSS_LOG_DIRECTORY;
+
+    @Value("${ALSS_FTP_HOST}")
+    private String ALSS_FTP_HOST;
+
+    @Value("${ALSS_FTP_PORT}")
+    private int ALSS_FTP_PORT;
+
+    @Value("${ALSS_FTP_USER}")
+    private String ALSS_FTP_USER;
+
+    @Value("${ALSS_FTP_PASS}")
+    private String ALSS_FTP_PASS;
+
+    @Value("${ALSS_FTP_DIR}")
+    private String ALSS_FTP_DIR;
+
+    @Value("${ALSS_MENTE_START}")
+    private String ALSS_MENTE_START;
+  
+    @Value("${ALSS_MENTE_END}")
+    private String ALSS_MENTE_END;
 
 
     @Autowired
     private PdfHkkLogMapper pdfHkkLogMapper;
-    /**
-     * ログ出力クラス
-     */
-    protected static final Logger logger = LoggerFactory.getLogger(CreatePdfHkkLogFileService.class);
 
     public int createService() {
 
-    // ジョブ開始ログの出力
-    String startMsg = "CreateFile" + ":" + Const.START_MESSAGE;
-    logger.info(startMsg);
+      // ジョブ開始ログの出力
+      String startMsg = "CreateFile" + ":" + Const.START_MESSAGE;
+      log.info(startMsg);
 
-    int successRecordCount = 0; // 成功処理数
-    int errorRecordCount = 0; // エラー処理数
-    String uktkNo = "";
+      int successRecordCount = 0; // 成功処理数
+      int errorRecordCount = 0; // エラー処理数
+      String uktkNo = "";
 
 
-    List<PdfHkkLogData> dataList = pdfHkkLogMapper.selectPdfHkkList();
-    if (dataList == null || dataList.isEmpty()) {
-      logger.info("PdfHkkLog is noFile");
+      List<PdfHkkLogData> dataList = pdfHkkLogMapper.selectPdfHkkList();
+      if (dataList == null || dataList.isEmpty()) {
+        log.info("PdfHkkLog is noFile");
+        return successRecordCount;
+
+      }
+      
+      Map<String, List<PdfHkkLogData>> groupedByDuke = dataList.stream().collect(Collectors.groupingBy(PdfHkkLogData::getRecRegUserId));
+
+      groupedByDuke.forEach((dukeId, list) -> {
+        sendCsvDownloadLog(list);
+      });
+
+      // 正常終了メッセージの出力
+      log.info("CreateFile" + ":" + Const.NORMAL_END_MESSAGE);
+
       return successRecordCount;
+    }
+
+
+	/**
+	 * アクセスログファイル送信(業務アクセスログ/取得データログ/送信ログファイルリスト)
+	 *
+	 * @param userDetails     ログインユーザ情報
+	 * @param csvData         出力するCSVデータ
+	 * @param clientIpAddress クライアントIPアドレス
+	 */
+	private synchronized void sendCsvDownloadLog(List<PdfHkkLogData> dataList) {
+    
+      // アクセスログを送信しない場合は終了する
+      if ("0".equals(ALSS_EXECUTE))
+        return;
+
+      String sendFileListFileNm = "";
+      String accessLogFileNm = "";
+      try {
+        // アクセスログファイル生成(業務アクセスログ/取得データログ/送信ログファイルリスト)
+        ArrayList<String> logFiles = this.outputCsvDownloadLog(dataList);
+        sendFileListFileNm = logFiles.get(0);
+        accessLogFileNm = logFiles.get(1);
+      } catch (Exception e) {
+        log.warn(e.getMessage());
+        return;
+      }
+
+      // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+      // 総合試験でファイルを送信しないので一旦コメントアウト
+      // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+      // // アクセスログ保存システムメンテナンスの場合
+      // String nowTime = DateUtil.getSysDate("dHHmm");
+      // if (ALSS_MENTE_START.compareTo(nowTime) >= 0 && ALSS_MENTE_END.compareTo(nowTime) <= 0) {
+      //   // 処理を終了する
+      //   log.info("アクセスログ保存システムメンテナンスの為、ファイルを送信しませんでした。[" + sendFileListFileNm + "," + accessLogFileNm + "]");
+      //   return;
+      // }
+      // // FTPクライアントを作成する
+      // Ftp ftp = new Ftp(ALSS_FTP_HOST, ALSS_FTP_PORT, ALSS_FTP_USER, ALSS_FTP_PASS, true, true, ALSS_FTP_DIR,
+      //     ALSS_LOG_DIRECTORY, "SHIFT_JIS");
+
+      // // 送信するファイルリストを取得する
+      // File dir = new File(ALSS_LOG_DIRECTORY);
+      // // listFilesメソッドを使用して一覧を取得する
+      // File[] list = dir.listFiles();
+      // for (int i = 0; i < list.length; i++) {
+      //   // 拡張子txt以外は無視
+      //   if (!list[i].getName().endsWith(".txt"))
+      //     continue;
+      //   try {
+      //     ftp.setLocalPath(list[i].getAbsolutePath());
+      //     ftp.put();
+      //     log.info("アクセスログ保存システム送信成功ファイル：[" + list[i].getName() + "]");
+      //     // 送信ファイルを削除
+      //     list[i].delete();
+      //   } catch (Exception e) {
+      //     // 送信失敗時、ファイルを保存
+      //     log.warn("アクセスログ保存システム送信失敗ファイル：[" + list[i].getName() + "]");
+      //     // ログファイルを移動
+      //     try {
+      //       File failDir = new File(ALSS_FAIL_FILE_DIR);
+      //       failDir.mkdirs();
+      //       Files.move(Paths.get(ALSS_LOG_DIRECTORY, list[i].getName()),
+      //           Paths.get(ALSS_FAIL_FILE_DIR, list[i].getName()));
+      //     } catch (IOException e1) {
+      //       log.warn("アクセスログ保存システム送信移動失敗ファイル：[" + list[i].getName() + "]");
+      //     }
+      //   }
+      // }
+      // try {
+      //   ftp.disconnect();
+      // } catch (Exception e) {
+      //   // FTPクローズのエラーは無視
+      // }
+
+	}
+	/**
+	 * アクセスログファイル生成(業務アクセスログ/取得データログ/送信ログファイルリスト)
+	 *
+	 * @param userDetails     ログインユーザ情報
+	 * @param csvData         出力するCSVデータ
+	 * @param clientIpAddress クライアントIPアドレス
+	 * @throws IOException
+	 */
+	private ArrayList<String> outputCsvDownloadLog(List<PdfHkkLogData> dataList) throws IOException {
+
+		ArrayList<String> logFileList = new ArrayList<String>();
+
+		Calendar cl = Calendar.getInstance();
+
+		// 業務アクセスログ内容作成
+		ArrayList<String> bizAccessLog = createBizAccessLog(dataList, cl);
+		// 取得データログ内容作成
+		ArrayList<String> downloadDataLog = createDownloadDataLog(dataList, cl);
+		// ログ内容を結合
+		List<String> logDetails = Stream.concat(bizAccessLog.stream(), downloadDataLog.stream())
+				.collect(Collectors.toList());
+
+		// アクセスログファイル生成(業務アクセスログ/取得データログ)
+		String accessLogFileName = this.getLogFilePath(cl);
+		File accessLogDir = new File(ALSS_LOG_DIRECTORY);
+		File accessLogFile = new File(ALSS_LOG_DIRECTORY + accessLogFileName);
+		if (accessLogFile.exists()) {
+			accessLogFile.delete();
+		}
+		if (!accessLogDir.exists()) {
+			accessLogDir.mkdirs();
+		}
+		accessLogFile.createNewFile();
+		PrintWriter accessLogPw = new PrintWriter(
+				new BufferedWriter(new OutputStreamWriter(new FileOutputStream(accessLogFile), "Shift-JIS")));
+		try {
+			// アクセスログファイルにデータを書き出す
+			accessLogPw.println(String.join("\n", logDetails));
+		} finally {
+			accessLogPw.close();
+		}
+
+		// 送信ログファイルリスト内容作成
+		ArrayList<String> sendListFileLog = createSendFileListLog(accessLogFileName, accessLogFile.length());
+
+		// ファイル内容を作成(送信ログファイルリスト)
+		String sendFileListName = this.getFileNameSendList(cl);
+		File sendListDir = new File(ALSS_LOG_DIRECTORY);
+		File sendListFile = new File(ALSS_LOG_DIRECTORY + sendFileListName);
+		if (sendListFile.exists()) {
+			sendListFile.delete();
+		}
+		if (!sendListDir.exists()) {
+			sendListFile.mkdirs();
+		}
+		sendListFile.createNewFile();
+		PrintWriter sendListPw = new PrintWriter(
+				new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sendListFile), "Shift-JIS")));
+		try {
+			// ファイル内容ファイルにデータを書き出す
+			sendListPw.println(String.join("\n", sendListFileLog));
+		} finally {
+			sendListPw.close();
+		}
+
+		logFileList.add(sendFileListName);
+		logFileList.add(accessLogFileName);
+
+		return logFileList;
+
+	}
+
+  	/**
+	 * アクセスログファイル内容生成(業務アクセスログ)
+	 *
+	 * @param userDetails     ログインユーザ情報
+	 * @param csvData         出力するCSVデータ
+	 * @param clientIpAddress クライアントIPアドレス
+	 * @param cl              現在時刻カレンダー
+	 */
+	private ArrayList<String> createBizAccessLog(List<PdfHkkLogData> dataList, Calendar cl) {
+
+    PdfHkkLogData pdfHkkLogData = dataList.get(0);
+
+		SimpleDateFormat sdfD = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat sdfT = new SimpleDateFormat("HHmmss");
+		SimpleDateFormat sdfId = new SimpleDateFormat("HHmmssSSS");
+
+		final String IDENTIFIER_HEAD = "S";
+		final String IDENTIFIER_BUSINESS_ACCESS_LOG = "A01";
+		String nowDate = sdfD.format(cl.getTime());
+		String nowTime = sdfT.format(cl.getTime());
+		final String BUSINESS_SYSTEM_USER_ID = "";
+		final String BUSINESS_SYSTEM_DEPARTMENT = "";
+		final String BUSINESS_SYSTEM_USER_NAME = "";
+		String clientIpAddressFix = this.fixString(pdfHkkLogData.getRemoteIpAddress());
+		String dataId = sdfId.format(cl.getTime());
+		final String NOTE = "";
+		final String SPARE = "";
+
+		// 業務アクセスログ内容
+		ArrayList<String> bizAccessLog = new ArrayList<String>();
+		String logRecordElements[] = { IDENTIFIER_HEAD, IDENTIFIER_BUSINESS_ACCESS_LOG, nowDate, nowTime,
+      pdfHkkLogData.getRecRegUserId(), pdfHkkLogData.getRecRegCorpNm(), pdfHkkLogData.getRecRegUserNm(),
+				BUSINESS_SYSTEM_USER_ID, BUSINESS_SYSTEM_DEPARTMENT, BUSINESS_SYSTEM_USER_NAME, clientIpAddressFix,
+				ALSS_BUSINESS_SYSTEM_CODE, ALSS_FUNCTION_CODE, dataId, String.valueOf(dataList.size()), NOTE, SPARE,
+				SPARE };
+
+		bizAccessLog.add(String.join(",", logRecordElements));
+
+		return bizAccessLog;
+
+	}
+
+  	/**
+	 * アクセスログファイル内容生成(取得データログ)
+	 *
+	 * @param userDetails     ログインユーザ情報
+	 * @param csvData         出力するCSVデータ
+	 * @param clientIpAddress クライアントIPアドレス
+	 * @param cl              現在時刻カレンダー
+	 */
+	private ArrayList<String> createDownloadDataLog(List<PdfHkkLogData> dataList, Calendar cl) {
+
+    SimpleDateFormat sdfId = new SimpleDateFormat("HHmmssSSS");
+
+    final String IDENTIFIER_HEAD = "S";
+    final String IDENTIFIER_DOWNLOAD_DATA_LOG = "D01";
+    final String BRANCH_NO = "1";
+    String dataId = sdfId.format(cl.getTime());
+    final String SPARE = "";
+
+    // 取得データログ内容
+    ArrayList<String> downloadDataLog = new ArrayList<String>();
+    for (int index = 0; index < dataList.size(); index++) {
+
+      PdfHkkLogData pdfHkkLogData = dataList.get(index);
+
+      String gasmeterSetNumber = null;
+      gasmeterSetNumber = this.fixString(pdfHkkLogData.getCustInfoCustNo());
+
+      String name = StringUtils.nvl(pdfHkkLogData.getCustInfoNameSei())
+                  + (StringUtils.isNullEmpty(pdfHkkLogData.getCustInfoNameMei()) ? "" : "　" + pdfHkkLogData.getCustInfoNameMei());
+
+      String nameKn = StringUtils.nvl(pdfHkkLogData.getCustInfoNameSeiKn())
+                    + (StringUtils.isNullEmpty(pdfHkkLogData.getCustInfoNameMeiKn()) ? "" : "　" + pdfHkkLogData.getCustInfoNameMeiKn());
+
+      String logRecordElements[] = { IDENTIFIER_HEAD, IDENTIFIER_DOWNLOAD_DATA_LOG, ALSS_BUSINESS_SYSTEM_CODE,
+          ALSS_FUNCTION_CODE, dataId, String.valueOf(index + 1), BRANCH_NO, name, nameKn, "", "", "", "", "", "",
+          gasmeterSetNumber, SPARE, SPARE };
+
+      downloadDataLog.add(String.join(",", logRecordElements));
 
     }
-    HttpHeaders httpHeaders = FileUtil.getHeadersForCsv("PDF出力ログ");
-    
-    for (PdfHkkLogData pdfHkkLogData : dataList) {
-      logger.info("mtmrNo = "+ pdfHkkLogData.getMtmrNo() + " uktkNo= " + pdfHkkLogData.getUktkNo());
-      successRecordCount++;
-    }
-    
 
-    StringBuilder CSVBody = generatePdfHkkLogCsvBody(dataList);
+    return downloadDataLog;
 
-    // 文字列に変換
-		String CSVBodyStr = CSVBody.toString();
-
-		// アクセスログ保存システムにログファイルを送信する
-		//this.sendCsvDownloadLog(userDetails, csvData, request.getRemoteAddr());
-
-		// CSVの主項目をBOM付きに変換
-		//ByteBuffer buff = FileUtil.makeBomForCsv(CSVBodyStr);
-
-    // 正常終了メッセージの出力
-    logger.info("CreateFile" + ":" + Const.NORMAL_END_MESSAGE);
-
-    return successRecordCount;
   }
 
+  	/**
+	 * アクセスログファイル名称を取得する
+	 *
+	 * @param cl 現在時刻カレンダー
+	 */
+	private String getLogFilePath(Calendar cl) {
 
-  public static StringBuilder generatePdfHkkLogCsvBody(List<PdfHkkLogData> pdfHkkLogList) {
-    
+		SimpleDateFormat sdfD = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat sdfId = new SimpleDateFormat("HHmmssSSS");
 
-		StringBuilder CSV = new StringBuilder();
-    // 項目不明なので、一旦こちらで
-		CSV.append("見積No,");
-		CSV.append("受付No,");
-		CSV.append("見積件名,");
-		CSV.append("出力担当者,");
-		CSV.append("出力年月,");
-		CSV.append("出力時刻\r\n");
+		final String FILE_NAME_HEAD = "s";
 
-		// データ書き出し
-		for (PdfHkkLogData logData : pdfHkkLogList) {
-			CSV.append(StringUtil.nvl(logData.getMtmrNo()) + ",");
-			CSV.append(StringUtil.nvl(logData.getUktkNo()) + ",");
-			CSV.append(StringUtil.nvl(logData.getMtmrNm()) + ",");
-			CSV.append(StringUtil.nvl(logData.getRecRegUserId()) + ",");
-			CSV.append(StringUtil.nvl(logData.getRecRegYmd()) + ",");
-			CSV.append(StringUtil.nvl(logData.getRecRegJkk()) + "\r\n");
+		return FILE_NAME_HEAD + "_" + sdfD.format(cl.getTime()) + "_" + ALSS_BUSINESS_SYSTEM_CODE + "_"
+				+ ALSS_FUNCTION_CODE + "_" + sdfId.format(cl.getTime()) + ".txt";
+	}
+
+  	/**
+	 * 送信ログファイルリスト内容生成
+	 *
+	 * @param userDetails     ログインユーザ情報
+	 * @param csvData         出力するCSVデータ
+	 * @param clientIpAddress クライアントIPアドレス
+	 * @param cl              現在時刻カレンダー
+	 */
+	private ArrayList<String> createSendFileListLog(String accessLogFilePath, long fileByte) {
+
+		final String RECORD_NO = "1";
+
+		// 取得データログ内容
+		ArrayList<String> sendFileListLog = new ArrayList<String>();
+
+		String logRecordElements[] = { RECORD_NO, this.fixString(accessLogFilePath), String.valueOf(fileByte) };
+
+		sendFileListLog.add(String.join(",", logRecordElements) + "\n");
+
+		return sendFileListLog;
+
+	}
+
+  	/**
+	 * 送信ログファイルリスト名称を取得する
+	 *
+	 * @param cl 現在時刻カレンダー
+	 */
+	private String getFileNameSendList(Calendar cl) {
+
+		SimpleDateFormat sdfD = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat sdfId = new SimpleDateFormat("HHmmssSSS");
+
+		final String FILE_NAME_HEAD = "sendlist";
+
+		return FILE_NAME_HEAD + "-" + sdfD.format(cl.getTime()) + "-" + sdfId.format(cl.getTime()) + ".txt";
+
+	}
+
+	/** 文字列を正常なフォーマットに整形する */
+	private String fixString(String str) {
+
+		if (StringUtils.isNullEmpty(str))
+			return "";
+
+		if (str.indexOf(",") >= 0) {
+			return "\"" + str + "\"";
+		} else {
+			return str;
 		}
-		return CSV;
 	}
 
 }

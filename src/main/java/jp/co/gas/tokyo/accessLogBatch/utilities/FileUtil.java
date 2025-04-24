@@ -1,4 +1,4 @@
-package tg.cars.reception.util;
+package jp.co.gas.tokyo.accessLogBatch.utilities;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
