@@ -6,15 +6,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectPdfHkkList" resultType="jp.co.gas.tokyo.accessLogBatch.entity.PdfHkkLogData">
 
-		SELECT
-            p.PDF_TYPE pdfType,
+		SELECT DISTINCT
+			p.PDF_TYPE pdfType,
             p.REMOTE_ADDRESS_IP remoteAddressIp,
             p.REC_REG_USER_ID recRegUserId,
             p.REC_REG_USER_NM recRegUserNm,
             p.REC_REG_USER_NM recRegUserNm,
             p.REC_REG_CORP_NM recRegCorpNm,
             p.REC_REG_YMD recRegYmd,
-            p.REC_REG_JKK recRegJkk,
             d.CUST_INFO_CUST_NO custInfoCustNo,
             d.CUST_INFO_NAME_SEI custInfoNameSei,
             d.CUST_INFO_NAME_MEI custInfoNameMei,
@@ -26,13 +25,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             ON p.MTMR_NO = m.MTMR_NO
         INNER JOIN DW_APPLICATION_DETAIL d
             ON m.uktk_no = d.uktk_no
-        WHERE 
+        WHERE
             p.LINKED_FLG = 0
         ORDER BY
             p.REC_REG_USER_ID,
             p.REC_REG_YMD,
-            p.REC_REG_JKK
-        LIMIT 1
+            p.PDF_TYPE
 
 	</select>
 
