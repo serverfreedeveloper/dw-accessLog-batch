@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 import jp.co.gas.tokyo.accessLogBatch.batch.JobBase;
 import jp.co.gas.tokyo.accessLogBatch.service.CreatePdfHkkLogFileService;
-import jp.co.gas.tokyo.accessLogBatch.utilities.Const;
 
 /**
  * PDF発行ログの出力
@@ -20,7 +19,6 @@ public class PdfHkkLog extends JobBase {
     @Override
     public void exec(String[] args) throws Exception {
 
-        int count = createFileService.createService();
-        logger.info("count" + ":" + count);
+        createFileService.createService();
     }
 }

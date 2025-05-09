@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 public class PdfHkkLogData {
 
+    private String id;
+
     /** 発行PDFデータ */
     private byte[] hkkPdfData;
 

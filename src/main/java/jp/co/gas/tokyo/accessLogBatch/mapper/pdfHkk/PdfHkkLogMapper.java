@@ -19,4 +19,5 @@ public interface PdfHkkLogMapper {
 	public List<PdfHkkLogData> selectPdfHkkList();
 
 
+	void updateLinkedFlg(String id);
 }

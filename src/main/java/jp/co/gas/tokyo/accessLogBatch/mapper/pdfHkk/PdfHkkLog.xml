@@ -6,7 +6,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectPdfHkkList" resultType="jp.co.gas.tokyo.accessLogBatch.entity.PdfHkkLogData">
 
-		SELECT DISTINCT
+		SELECT
+            p.ID,
 			p.PDF_TYPE pdfType,
             p.REMOTE_ADDRESS_IP remoteAddressIp,
             p.REC_REG_USER_ID recRegUserId,
@@ -14,6 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             p.REC_REG_USER_NM recRegUserNm,
             p.REC_REG_CORP_NM recRegCorpNm,
             p.REC_REG_YMD recRegYmd,
+            p.REC_REG_JKK recRegJkk,
             d.CUST_INFO_CUST_NO custInfoCustNo,
             d.CUST_INFO_NAME_SEI custInfoNameSei,
             d.CUST_INFO_NAME_MEI custInfoNameMei,
@@ -33,5 +35,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             p.PDF_TYPE
 
 	</select>
+
+    <update id="updateLinkedFlg">
+        UPDATE
+			PDF_HKK_LOG
+		SET
+			LINKED_FLG = 1
+		WHERE
+			ID = #{id}
+    </update>
 
 </mapper>
