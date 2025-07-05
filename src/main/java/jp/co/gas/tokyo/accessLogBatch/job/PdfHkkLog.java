@@ -19,6 +19,6 @@ public class PdfHkkLog extends JobBase {
     @Override
     public void exec(String[] args) throws Exception {
 
-        createFileService.createService();
+        createFileService.exec();
     }
 }

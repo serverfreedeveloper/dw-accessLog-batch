@@ -5,13 +5,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="jp.co.gas.tokyo.accessLogBatch.mapper.pdfHkk.PdfHkkLogMapper">
 
     <select id="selectPdfHkkList" resultType="jp.co.gas.tokyo.accessLogBatch.entity.PdfHkkLogData">
-
-		SELECT
+        SELECT
             p.ID,
-			p.PDF_TYPE pdfType,
+            p.PDF_TYPE pdfType,
             p.REMOTE_ADDRESS_IP remoteAddressIp,
             p.REC_REG_USER_ID recRegUserId,
-            p.REC_REG_USER_NM recRegUserNm,
             p.REC_REG_USER_NM recRegUserNm,
             p.REC_REG_CORP_NM recRegCorpNm,
             p.REC_REG_YMD recRegYmd,
@@ -29,11 +27,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             ON m.uktk_no = d.uktk_no
         WHERE
             p.LINKED_FLG = 0
+        UNION
+        SELECT
+            p.ID,
+            p.PDF_TYPE pdfType,
+            p.REMOTE_ADDRESS_IP remoteAddressIp,
+            p.REC_REG_USER_ID recRegUserId,
+            p.REC_REG_USER_NM recRegUserNm,
+            p.REC_REG_CORP_NM recRegCorpNm,
+            p.REC_REG_YMD recRegYmd,
+            p.REC_REG_JKK recRegJkk,
+            d.CUST_INFO_CUST_NO custInfoCustNo,
+            d.CUST_INFO_NAME_SEI custInfoNameSei,
+            d.CUST_INFO_NAME_MEI custInfoNameMei,
+            d.CUST_INFO_NAME_SEI_KN custInfoNameSeiKn,
+            d.CUST_INFO_NAME_MEI_KN custInfoNameMeiKn
+        FROM
+            PDF_HKK_LOG p
+        INNER JOIN DW_APPLICATION_DETAIL d
+            ON p.uktk_no = d.uktk_no
+        WHERE
+            p.LINKED_FLG = 0
+            AND p.PDF_TYPE= '5'
         ORDER BY
-            p.REC_REG_USER_ID,
-            p.REC_REG_YMD,
-            p.PDF_TYPE
-
+            recRegUserId,
+            recRegYmd,
+            pdfType
 	</select>
 
     <update id="updateLinkedFlg">

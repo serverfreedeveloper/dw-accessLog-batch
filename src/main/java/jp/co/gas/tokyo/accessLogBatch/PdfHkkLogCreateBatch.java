@@ -30,7 +30,7 @@ public class PdfHkkLogCreateBatch {
 		// 引数なしで実行された場合
 		if (args == null || args.length == 0) {
 			args = new String[1];
-			args[0] = "PDF_HKK_LOG";
+			args[0] = "EXECUTE_ALL";
 		}
 
 		Logger logger = LoggerFactory.getLogger(PdfHkkLogCreateBatch.class);
