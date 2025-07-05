@@ -92,7 +92,11 @@ public class CreatePdfHkkLogFileService {
 	private String storageAccountName;
 
 	/** コンテナ名（導管管理PDF） */
-	@Value("${DW_ACCESSLOG_APP_NAME}")
+	// @Value("${DW_ACCESSLOG_APP_NAME}")
+	// private String containerName;
+
+	/** コンテナ名（導管管理画面） */
+	@Value("${DW_MNG_APP_NAME}")
 	private String containerName;
 
 	/** アクセスログ保存一時ディレクトリ（導管管理PDF） */

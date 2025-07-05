@@ -23,31 +23,21 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class DwMngSendLogService {
 
-  /**
-   * ログ送信Service
-   */
+  /** ログ送信Service */
   private final SendAccessLogService sendAccessLogService;
 
-  /**
-   * クライアント生成Factory
-   */
+  /** クライアント生成Factory */
   private final AzureBlobStorageFactory azureBlobStorageFactory;
 
-  /**
-   * アクセスログ保存一時ディレクトリ（導管管理画面）
-   */
+  /** アクセスログ保存一時ディレクトリ（導管管理画面） */
   @Value("${ALSS_LOG_DIR_DW_MNG}")
   private String ALSS_LOG_DIR_DW_MNG;
 
-  /**
-   * ストレージアカウント名（導管系）
-   */
+  /** ストレージアカウント名（導管系） */
   @Value("${DW_STOR_NAME}")
   private String storageAccountName;
 
-  /**
-   * コンテナ名（導管管理画面）
-   */
+  /** コンテナ名（導管管理画面） */
   @Value("${DW_MNG_APP_NAME}")
   private String containerName;
 
