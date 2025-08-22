@@ -13,9 +13,12 @@ import java.nio.file.Paths;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.util.UriUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * FileUtilクラス
  */
+@Slf4j
 public class FileUtil {
 
 	/**
@@ -105,4 +108,33 @@ public class FileUtil {
 		return buff;
 
 	}
+
+	/**
+	 * ファイル作成
+	 * @param data データ
+	 * @param fileName ファイル名
+	 * @param filePath ファイルパス
+	 */
+	public static void createFile(byte[] data, String fileName, String filePath) throws IOException{
+        try {
+            createFile(data, fileName + '/' + filePath);
+        } catch (IOException e) {
+			throw e;
+        }
+    }
+
+	/**
+	 * ファイル作成
+	 * @param data データ
+	 * @param fileName ファイル名
+	 * @param filePath ファイルパス
+	 */
+	public static void createFile(byte[] data, String filePath) throws IOException{
+        try {
+            Path path = Paths.get(filePath);
+            Files.write(path, data);
+        } catch (IOException e) {
+			throw e;
+        }
+    }
 }

@@ -1,41 +1,44 @@
 package jp.co.gas.tokyo.accessLogBatch.service;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
+// import java.io.BufferedWriter;
+// import java.io.File;
+// import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+// import java.io.OutputStreamWriter;
+// import java.io.PrintWriter;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+// import java.nio.file.Files;
+// import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.ServerProperties.Jetty.Accesslog;
+// import org.springframework.boot.autoconfigure.web.ServerProperties.Jetty.Accesslog;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
-import com.azure.core.http.rest.PagedIterable;
-import com.azure.core.util.BinaryData;
-import com.azure.storage.blob.BlobClient;
-import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.models.BlobItem;
+// import com.azure.core.http.rest.PagedIterable;
+// import com.azure.core.util.BinaryData;
+// import com.azure.storage.blob.BlobClient;
+// import com.azure.storage.blob.BlobContainerClient;
+// import com.azure.storage.blob.models.BlobItem;
 
-import jp.co.gas.tokyo.accessLogBatch.common.azure.storage.AzureBlobStorageFactory;
+// import jp.co.gas.tokyo.accessLogBatch.common.azure.storage.AzureBlobStorageFactory;
 import jp.co.gas.tokyo.accessLogBatch.entity.AccesssLogData;
 import jp.co.gas.tokyo.accessLogBatch.entity.PdfHkkLogData;
-import jp.co.gas.tokyo.accessLogBatch.ftp.Ftp;
+// import jp.co.gas.tokyo.accessLogBatch.ftp.Ftp;
 import jp.co.gas.tokyo.accessLogBatch.mapper.pdfHkk.PdfHkkLogMapper;
 import jp.co.gas.tokyo.accessLogBatch.utilities.Const;
-import jp.co.gas.tokyo.accessLogBatch.utilities.DateUtil;
+// import jp.co.gas.tokyo.accessLogBatch.utilities.DateUtil;
+import jp.co.gas.tokyo.accessLogBatch.utilities.FileUtil;
 import jp.co.gas.tokyo.accessLogBatch.utilities.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,15 +88,15 @@ public class CreatePdfHkkLogFileService {
     // private String ALSS_MENTE_END;
 
 	/** クライアント生成Factory */
-	private final AzureBlobStorageFactory azureBlobStorageFactory;
+	// private final AzureBlobStorageFactory azureBlobStorageFactory;
 	
 	/** ストレージアカウント名（導管系） */
 	@Value("${DW_STOR_NAME}")
 	private String storageAccountName;
 
 	/** コンテナ名（導管管理PDF） */
-	@Value("${DW_ACCESSLOG_APP_NAME}")
-	private String containerName;
+	// @Value("${DW_ACCESSLOG_APP_NAME}")
+	// private String containerName;
 
 	/** アクセスログ保存一時ディレクトリ（導管管理PDF） */
 	@Value("${ALSS_LOG_DIR_DW_ACCESSLOG}")
@@ -114,24 +117,24 @@ public class CreatePdfHkkLogFileService {
 			createService();
 
 			// コンテナ操作クライアント作成
-			BlobContainerClient containerClient = azureBlobStorageFactory
-				.createBlobContainerClient(this.storageAccountName, this.containerName);
+			// BlobContainerClient containerClient = azureBlobStorageFactory
+			// 	.createBlobContainerClient(this.storageAccountName, this.containerName);
 
-			log.info("url: " + containerClient.getBlobContainerUrl());
-			log.info("storage: " + containerClient.getAccountName());
-			log.info("containername: " + containerClient.getBlobContainerName());
+			// log.info("url: " + containerClient.getBlobContainerUrl());
+			// log.info("storage: " + containerClient.getAccountName());
+			// log.info("containername: " + containerClient.getBlobContainerName());
 
-			// アクセスログリスト取得
-			PagedIterable<BlobItem> blobList = containerClient.listBlobs();
-			List<String> fileNameList = new ArrayList<String>();
-			blobList.forEach(blob -> {
-				fileNameList.add(blob.getName());
-			});
+			// // アクセスログリスト取得
+			// PagedIterable<BlobItem> blobList = containerClient.listBlobs();
+			// List<String> fileNameList = new ArrayList<String>();
+			// blobList.forEach(blob -> {
+			// 	fileNameList.add(blob.getName());
+			// });
 
 			// 送信処理実行
-			sendAccessLogService.exec(fileNameList, containerClient, ALSS_LOG_DIR_DW_ACCESSLOG);
+			sendAccessLogService.exec(ALSS_LOG_DIR_DW_ACCESSLOG);
 		} catch (Exception e) {
-			log.warn("アクセスログ送信処理に失敗しました。{}", e);
+			log.error("アクセスログ送信処理に失敗しました。{}", e);
 		} finally {
 			log.info("==================== アクセスログ送信 PDF_HKK_LOG 処理終了 ====================");
 		}
@@ -205,8 +208,18 @@ public class CreatePdfHkkLogFileService {
 		dataList.forEach(pdflog ->{
 			pdfHkkLogMapper.updateLinkedFlg(pdflog.getId());
 		});
+
 		// 正常終了メッセージの出力
 		log.info("CreateFile" + ":" + Const.NORMAL_END_MESSAGE);
+
+		// List<String> fileList = new ArrayList<>();
+
+		// for(AccesssLogData logFileName : logFileNameList) {
+		// 	fileList.add(logFileName.getFileName());
+		// }
+		// fileList.add(sendFileListName);
+
+		// return fileList;
     }
 
 
@@ -424,29 +437,34 @@ public class CreatePdfHkkLogFileService {
 	private void execUpload(String fileName, List<String> logData) {
 
 		// コンテナ操作クライアント作成
-		BlobContainerClient containerClient = azureBlobStorageFactory
-			.createBlobContainerClient(this.storageAccountName, this.containerName);
+		// BlobContainerClient containerClient = azureBlobStorageFactory
+		// 	.createBlobContainerClient(this.storageAccountName, this.containerName);
 
-		BlobClient client = containerClient.getBlobClient(fileName);
+		// BlobClient client = containerClient.getBlobClient(fileName);
 
 		// ログファイル生成（SHIFT-JIS(MS932)）
 		byte[] logByteArray = String.join("\n", logData).getBytes(Charset.forName("MS932"));
-		BinaryData logBinaryData = BinaryData.fromBytes(logByteArray);
+		// BinaryData logBinaryData = BinaryData.fromBytes(logByteArray);
+
+		String filePath = ALSS_LOG_DIR_DW_ACCESSLOG + fileName;
 
 		// 送信ログ格納処理実行
 		try {
 			// 送信ログファイルを格納、すでに存在する場合は上書きする
-			client.upload(logBinaryData, true);
+			// client.upload(logBinaryData, true);
 
 			// ログ格納処理結果
-			if (client.exists()) {
-				log.info("アクセスログ保存用ストレージ（小売系）格納成功ファイル：[{}]", fileName);
-			} else {
-				log.warn("アクセスログ保存用ストレージ（小売系）格納失敗ファイル：[{}]", fileName);
-			}
+			// if (client.exists()) {
+			// 	log.info("アクセスログ保存用ストレージ（小売系）格納成功ファイル：[{}]", fileName);
+			// } else {
+			// 	log.warn("アクセスログ保存用ストレージ（小売系）格納失敗ファイル：[{}]", fileName);
+			// }
 
+			// 一時フォルダにファイルを生成
+			FileUtil.createFile(logByteArray, filePath);
+			
 		} catch (Exception e) {
-			log.warn("アクセスログ保存用ストレージ（小売系）格納失敗ファイル：[{}]", fileName, e);
+			log.error("アクセスログファイル保存用一時フォルダへの格納失敗：[{}]", filePath, e);
 		}
 	}
 

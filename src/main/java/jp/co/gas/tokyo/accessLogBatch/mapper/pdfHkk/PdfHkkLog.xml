@@ -27,6 +27,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             ON m.uktk_no = d.uktk_no
         WHERE
             p.LINKED_FLG = 0
+            AND p.REC_REG_USER_ID IS NOT NULL
+            AND p.REC_REG_USER_ID &lt;&gt; ''
         UNION
         SELECT
             p.ID,
@@ -49,6 +51,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE
             p.LINKED_FLG = 0
             AND p.PDF_TYPE= '5'
+            AND p.REC_REG_USER_ID IS NOT NULL
+            AND p.REC_REG_USER_ID &lt;&gt; ''
         ORDER BY
             recRegUserId,
             recRegYmd,
