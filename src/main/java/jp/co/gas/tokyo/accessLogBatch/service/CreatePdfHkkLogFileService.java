@@ -134,7 +134,7 @@ public class CreatePdfHkkLogFileService {
 			// 送信処理実行
 			sendAccessLogService.exec(ALSS_LOG_DIR_DW_ACCESSLOG);
 		} catch (Exception e) {
-			log.error("アクセスログ送信処理に失敗しました。{}", e);
+			log.error("アクセスログ送信処理に失敗しました。", e);
 		} finally {
 			log.info("==================== アクセスログ送信 PDF_HKK_LOG 処理終了 ====================");
 		}

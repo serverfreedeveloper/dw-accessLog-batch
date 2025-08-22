@@ -6,7 +6,7 @@
 
 	<groupId>jp.co.gas.tokyo.accessLogBatch</groupId>
 	<artifactId>dw-accessLog-batch</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.7</version>
 
 	<name>accessLogBatch</name>
 	<description>Demo project for Spring Boot</description>

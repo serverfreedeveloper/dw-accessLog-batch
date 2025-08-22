@@ -51,7 +51,8 @@ public class DwUketsukeMngSendLogService {
       BlobContainerClient containerClient = azureBlobStorageFactory
           .createBlobContainerClient(this.storageAccountName, this.containerName);
 
-      log.info("url: {}, storage: {}, containername: {}", 
+      log.info("{}url: {}storage: {}containername: {}", 
+        System.lineSeparator(),
         containerClient.getBlobContainerUrl() + System.lineSeparator(), 
         containerClient.getAccountName() + System.lineSeparator(), 
         containerClient.getBlobContainerName());
@@ -67,7 +68,7 @@ public class DwUketsukeMngSendLogService {
       sendAccessLogService.exec(fileNameList, containerClient, ALSS_LOG_DIR_DW_MNG);
 
     } catch (Exception e) {
-      log.warn("アクセスログ 導管タブ 送信処理に失敗しました。", e.getMessage());
+      log.warn("アクセスログ 導管タブ 送信処理に失敗しました。", e);
     } finally {
       log.info("==================== アクセスログ送信 導管タブ 処理終了 ====================");
     }
