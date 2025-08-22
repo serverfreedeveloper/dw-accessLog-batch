@@ -13,14 +13,14 @@ public class PdfHkkLogData {
     /** 発行PDFデータ */
     private byte[] hkkPdfData;
 
-    /** 発行PDF種別 1:見積書 2:納品書兼ご請求書 3:機器伝票兼作業結果報告書 4:領収書 */
+    /** 発行PDF種別 1:見積書 2:納品書兼ご請求書 3:機器伝票兼作業結果報告書 4:領収書 5:案件連絡票印刷 */
     private String pdfType;
 
     /** 受付番号 */
     private String uktkNo;
 
     /** リモートアドレスIP */
-    private String remoteIpAddress;
+    private String remoteAddressIp;
 
     /** レコード登録ユーザーID */
     private String recRegUserId;

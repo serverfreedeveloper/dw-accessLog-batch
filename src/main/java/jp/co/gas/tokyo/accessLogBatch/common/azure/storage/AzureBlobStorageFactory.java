@@ -22,10 +22,9 @@ public class AzureBlobStorageFactory {
     // エンドポイントURI
     String endpointUri = "https://" + storageAccountName + ".blob.core.windows.net/";
 
-    log.info("{}storageAccountName: {}containerName: {}endpointUri: {}", 
-      System.lineSeparator(),
-      storageAccountName + System.lineSeparator(), 
-      containerName + System.lineSeparator(), 
+    log.info("storageAccountName: {}, containerName: {}, endpointUri: {}", 
+      storageAccountName, 
+      containerName, 
       endpointUri);
 
     DefaultAzureCredential defaultCredential = new DefaultAzureCredentialBuilder().build();

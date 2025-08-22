@@ -18,6 +18,9 @@ public interface PdfHkkLogMapper {
 	 */
 	public List<PdfHkkLogData> selectPdfHkkList();
 
-
-	void updateLinkedFlg(String id);
+	/**
+	 * IDをキーに連携フラグを更新する
+	 * @param id
+	 */
+	public void updateLinkedFlg(String id, String flg);
 }

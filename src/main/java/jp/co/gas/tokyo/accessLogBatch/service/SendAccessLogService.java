@@ -70,12 +70,12 @@ public class SendAccessLogService {
     for (String fileName : fileNameList) {
 
       // アクセスログ保存システムメンテナンスの場合
-      String nowTime = DateUtil.getSysDate("dHHmm");
-      if (ALSS_MENTE_START.compareTo(nowTime) >= 0 && ALSS_MENTE_END.compareTo(nowTime) <= 0) {
-
+      if (isMaintenance()) {
         // 処理を終了
-        log.info("アクセスログ保存システムメンテナンスの為、ファイルを送信しませんでした。アクセスログ送信処理件数 成功：" + successCount + "件, 失敗："
-            + failureCount + "件, 未処理：" + (fileNameList.size() - successCount - failureCount));
+        log.info("アクセスログ保存システムメンテナンスの為、ファイルを送信しませんでした。\nアクセスログ送信処理件数 成功：{}件, 失敗：件, 未処理：", 
+          successCount, 
+          failureCount, 
+          (fileNameList.size() - successCount - failureCount));
         break;
       }
 
@@ -106,7 +106,7 @@ public class SendAccessLogService {
             failureCount++;
 
             // 処理を終了し、次のファイル送信を実行
-            log.warn("アクセスログファイルの取得に失敗しました。ファイル名：" + fileName + ", エラー：" + e.getMessage());
+            log.warn("アクセスログファイルの取得に失敗しました。ファイル名：{}", fileName, e);
             continue;
           }
 
@@ -114,7 +114,7 @@ public class SendAccessLogService {
             // アクセスログ保存システムへ送信
             ftpService.setLocalPath(accessLogFile.getAbsolutePath());
             ftpService.put();
-            log.info("アクセスログ保存システム送信成功ファイル：[" + fileName + "]");
+            log.info("アクセスログ保存システム送信成功ファイル：[]", fileName);
 
             // 送信成功時にログストレージ上のファイルを削除
             file.delete();
@@ -123,18 +123,18 @@ public class SendAccessLogService {
           } catch (Exception e) {
             // 失敗カウント追加
             failureCount++;
-            log.warn("アクセスログ保存システム送信失敗ファイル：[" + fileName + "], エラー：" + e.getMessage());
+            log.warn("アクセスログ保存システム送信失敗ファイル：[{}]", fileName, e);
           } finally {
             // VM上のローカルファイルを削除
             accessLogFile.delete();
           }
         } else {
-          log.warn("アクセスログファイルが存在しません。ファイル名：" + fileName);
+          log.warn("アクセスログファイルが存在しません。ファイル名：{}", fileName);
         }
       }
     }
 
-    log.info("アクセスログ送信処理件数 成功：" + successCount + "件, 失敗：" + failureCount + "件");
+    log.info("アクセスログ送信処理件数 成功：{}件, 失敗：{}件", successCount, failureCount);
 
     // 全てのファイル送信後、接続をクローズ
     try {
@@ -162,7 +162,7 @@ public class SendAccessLogService {
             this.exec(fileNames, alssLogDir);
         }
     } else {
-        System.out.println("指定ディレクトリが存在しないか、ディレクトリではありません");
+        log.info("指定ディレクトリが存在しないか、ディレクトリではありません。{}", alssLogDir);
     }
   }
 
@@ -190,11 +190,12 @@ public class SendAccessLogService {
     for (String fileName : fileNameList) {
 
       // アクセスログ保存システムメンテナンスの場合
-      String nowTime = DateUtil.getSysDate("dHHmm");
-      if (ALSS_MENTE_START.compareTo(nowTime) >= 0 && ALSS_MENTE_END.compareTo(nowTime) <= 0) {
+      if (isMaintenance()) {
         // 処理を終了
-        log.info("アクセスログ保存システムメンテナンスの為、ファイルを送信しませんでした。アクセスログ送信処理件数 成功：" + successCount + "件, 失敗："
-            + failureCount + "件, 未処理：" + (fileNameList.size() - successCount - failureCount));
+        log.info("アクセスログ保存システムメンテナンスの為、ファイルを送信しませんでした。\nアクセスログ送信処理件数 成功：{}件, 失敗：件, 未処理：", 
+          successCount, 
+          failureCount, 
+          (fileNameList.size() - successCount - failureCount));
         break;
       }
 
@@ -205,30 +206,6 @@ public class SendAccessLogService {
         
         // ファイルがフォルダ上に存在している場合
         if (file.exists()) {
-
-          // ファイルパス
-          // File accessLogDir = new File(alssLogDir);
-          // File accessLogFile = new File(filePath);
-
-          // // アクセスログの格納先が存在しない場合は作成
-          // if (!accessLogDir.exists()) {
-          //   // mkdirs()で親ディレクトリごと生成
-          //   accessLogDir.mkdirs();
-          // }
-
-          // try {
-          //   // 対象のファイルをストレージから取得、送信対象のアクセスログファイルがサーバに存在する場合は上書き
-          //   accessLogFile.createNewFile();
-          //   file.downloadToFile(accessLogFile.getAbsolutePath(), true);
-          // } catch (Exception e) {
-          //   // 失敗カウント追加
-          //   failureCount++;
-
-          //   // 処理を終了し、次のファイル送信を実行
-          //   log.warn("アクセスログファイルの取得に失敗しました。ファイル名：" + fileName + ", エラー：" + e.getMessage());
-          //   continue;
-          // }
-
           try {
             // アクセスログ保存システムへ送信
             ftpService.setLocalPath(file.getAbsolutePath());
@@ -262,5 +239,22 @@ public class SendAccessLogService {
     } catch (Exception e) {
       // クローズ時のエラーは無視
     }
+  }
+
+  /**
+   * アクセスログ保存システムメンテナンス判定
+   * TODO ただし、現状この処理は常にfalseになるため機能はしていない
+   * 開始日・終了日の定義が "dHHmm" フォーマットと合っていないため要調査。
+   * 運用上必要であれば、"ddHHmm" のフォーマットで合わせて判定
+   * @return true:メンテナンス期間 false:メンテナンス期間外
+   */
+  private boolean isMaintenance() {
+    // アクセスログ保存システムメンテナンスの場合
+    String nowTime = DateUtil.getSysDate("dHHmm");
+
+    if (ALSS_MENTE_START.compareTo(nowTime) >= 0 && ALSS_MENTE_END.compareTo(nowTime) <= 0) {
+      return true;
+    }
+    return false;
   }
 }

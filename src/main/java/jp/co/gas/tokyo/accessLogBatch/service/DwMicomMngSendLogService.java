@@ -51,10 +51,9 @@ public class DwMicomMngSendLogService {
       BlobContainerClient containerClient = azureBlobStorageFactory
           .createBlobContainerClient(this.storageAccountName, this.containerName);
 
-      log.info("{}url: {}storage: {}containername: {}", 
-        System.lineSeparator(),
-        containerClient.getBlobContainerUrl() + System.lineSeparator(), 
-        containerClient.getAccountName() + System.lineSeparator(), 
+      log.info("url: {}, storage: {}, containername: {}", 
+        containerClient.getBlobContainerUrl(), 
+        containerClient.getAccountName(), 
         containerClient.getBlobContainerName());
 
       // アクセスログリスト取得
