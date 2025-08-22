@@ -5,12 +5,10 @@ import jp.co.gas.tokyo.accessLogBatch.batch.JobBase;
 import jp.co.gas.tokyo.accessLogBatch.service.CreatePdfHkkLogFileService;
 import jp.co.gas.tokyo.accessLogBatch.service.DwMngSendLogService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * アクセスログ送信バッチ 全て実行
  */
-@Slf4j
 @RequiredArgsConstructor
 @Component("EXECUTE_ALL")
 public class ExecuteAll extends JobBase {

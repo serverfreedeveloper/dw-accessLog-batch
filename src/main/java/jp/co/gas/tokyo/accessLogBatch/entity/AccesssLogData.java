@@ -11,5 +11,5 @@ public class AccesssLogData {
     /** ファイルサイズ */
     private long fileByte;
 
-    private String filaName;
+    private String fileName;
 }

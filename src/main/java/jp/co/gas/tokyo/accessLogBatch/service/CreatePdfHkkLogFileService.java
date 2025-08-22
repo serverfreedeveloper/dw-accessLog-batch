@@ -92,11 +92,7 @@ public class CreatePdfHkkLogFileService {
 	private String storageAccountName;
 
 	/** コンテナ名（導管管理PDF） */
-	// @Value("${DW_ACCESSLOG_APP_NAME}")
-	// private String containerName;
-
-	/** コンテナ名（導管管理画面） */
-	@Value("${DW_MNG_APP_NAME}")
+	@Value("${DW_ACCESSLOG_APP_NAME}")
 	private String containerName;
 
 	/** アクセスログ保存一時ディレクトリ（導管管理PDF） */
@@ -135,7 +131,7 @@ public class CreatePdfHkkLogFileService {
 			// 送信処理実行
 			sendAccessLogService.exec(fileNameList, containerClient, ALSS_LOG_DIR_DW_ACCESSLOG);
 		} catch (Exception e) {
-			log.warn("アクセスログ送信処理に失敗しました。", e.getMessage());
+			log.warn("アクセスログ送信処理に失敗しました。{}", e);
 		} finally {
 			log.info("==================== アクセスログ送信 PDF_HKK_LOG 処理終了 ====================");
 		}
@@ -155,7 +151,7 @@ public class CreatePdfHkkLogFileService {
 
 		List<PdfHkkLogData> dataList = pdfHkkLogMapper.selectPdfHkkList();
 		if (dataList == null || dataList.isEmpty()) {
-		log.info("PdfHkkLog is noFile");
+			log.info("PdfHkkLog is noFile");
 			return;
 		}
 		log.info("対象件数 : " + dataList.size());
@@ -166,7 +162,7 @@ public class CreatePdfHkkLogFileService {
 		List<AccesssLogData> logFileNameList = new ArrayList<AccesssLogData>();
 		groupedByDuke.forEach((dukeId, list) -> {
 			AccesssLogData logData = this.outputCsvDownloadLog(list);
-			if (logData != null && !StringUtils.isNullEmpty(logData.getFilaName())) {
+			if (logData != null && !StringUtils.isNullEmpty(logData.getFileName())) {
 				logFileNameList.add(logData);
 			}
 		});
@@ -303,7 +299,7 @@ public class CreatePdfHkkLogFileService {
 		this.execUpload(accessLogFileName, logDetails);
 
 		AccesssLogData logData = new AccesssLogData();
-		logData.setFilaName(accessLogFileName);
+		logData.setFileName(accessLogFileName);
 		logData.setFileByte(accessLogFileLength);
 
 		// File accessLogDir = new File(ALSS_LOG_DIRECTORY);
@@ -344,7 +340,7 @@ public class CreatePdfHkkLogFileService {
 	 */
 	private ArrayList<String> createBizAccessLog(List<PdfHkkLogData> dataList, Calendar cl) {
 
-    PdfHkkLogData pdfHkkLogData = dataList.get(0);
+    	PdfHkkLogData pdfHkkLogData = dataList.get(0);
 
 		SimpleDateFormat sdfD = new SimpleDateFormat("yyyyMMdd");
 		SimpleDateFormat sdfT = new SimpleDateFormat("HHmmss");
@@ -444,13 +440,13 @@ public class CreatePdfHkkLogFileService {
 
 			// ログ格納処理結果
 			if (client.exists()) {
-				log.info("アクセスログ保存用ストレージ（小売系）格納成功ファイル：[" + fileName + "]");
+				log.info("アクセスログ保存用ストレージ（小売系）格納成功ファイル：[{}]", fileName);
 			} else {
-				log.warn("アクセスログ保存用ストレージ（小売系）格納失敗ファイル：[" + fileName + "]");
+				log.warn("アクセスログ保存用ストレージ（小売系）格納失敗ファイル：[{}]", fileName);
 			}
 
 		} catch (Exception e) {
-			log.warn("アクセスログ保存用ストレージ（小売系）格納失敗ファイル：[" + fileName + "], " + "エラー：" + e.getMessage());
+			log.warn("アクセスログ保存用ストレージ（小売系）格納失敗ファイル：[{}]", fileName, e);
 		}
 	}
 
@@ -484,7 +480,7 @@ public class CreatePdfHkkLogFileService {
 
 		for (AccesssLogData logData : accessLogFilePathList) {
 			
-			String logRecordElements[] = { String.valueOf(recordNo), this.fixString(logData.getFilaName()), String.valueOf(logData.getFileByte()) };
+			String logRecordElements[] = { String.valueOf(recordNo), this.fixString(logData.getFileName()), String.valueOf(logData.getFileByte()) };
 			sendFileListLog.add(String.join(",", logRecordElements));
 			recordNo++;
 		}

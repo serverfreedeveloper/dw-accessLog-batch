@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE logback>
 <configuration>
-	<include resource="org\springframework\boot\logging\logback\base.xml" />
+	<include resource="org/springframework/boot/logging/logback/base.xml" />
+
+	<!-- デフォルトのログレベル（profile未指定時用） -->
+	<property name="LOG_LEVEL" value="INFO" />
+
 	<timestamp key="bySecond" datePattern="yyyyMMddHHmmss" />
 	<timestamp key="byDay" datePattern="yyyyMMdd" />
 	<springProfile name="pt">
 		<property name="logname" value=".log" />
-		<property name="logpath" value="/usr/local/jboss/khsnRirekiBatch/logs/" />
+		<property name="logpath" value="/usr/local/jboss/dw_accesslog_send_batch/logs/" />
 		<property name="logfilename" value="pt-app" />
 		<property name="accessLogfilename" value="pt-app-access" />
 		<!--ログレベル -->
@@ -18,7 +22,7 @@
 	</springProfile>
 	<springProfile name="dev">
 		<property name="logname" value=".log" />
-		<property name="logpath" value="/home/apladmin/khsnRirekiBatch/logs/" />
+		<property name="logpath" value="/home/apladmin/dw_accesslog_send_batch/logs/" />
 		<property name="logfilename" value="app" />
 		<property name="accessLogfilename" value="app-access" />
 		<!--ログレベル -->
@@ -30,7 +34,7 @@
 	</springProfile>
 	<springProfile name="prod">
 		<property name="logname" value=".log" />
-		<property name="logpath" value="/home/apladmin/khsnRirekiBatch/logs/" />
+		<property name="logpath" value="/home/apladmin/dw_accesslog_send_batch/logs/" />
 		<property name="logfilename" value="app" />
 		<property name="accessLogfilename" value="app-access" />
 		<!--ログレベル -->
@@ -42,11 +46,11 @@
 	</springProfile>
 
   <!-- ログ名 -->
-  <property name="CUSTOMER_HISTORIES_API_log" value="_customer-histories-api" />
+  <!-- <property name="CUSTOMER_HISTORIES_API_log" value="_customer-histories-api" />
   <property name="TGCARSCOM_API_021_log" value="_tg-cars-com-api-021" />
   <property name="CIRIUS_API_PIPELINE_CUSTOMER_NUMBER_RELATION_log" value="_cirius-api-pipeline-customer-number-relation" />
   <property name="KHSN_log" value="_khsn" />
-  <property name="PIPELINE_log" value="_pipeline" />
+  <property name="PIPELINE_log" value="_pipeline" /> -->
 
 
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -88,7 +92,7 @@
 	</logger>
 -->
 
-<appender name="CUSTOMER_HISTORIES_API" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<!-- <appender name="CUSTOMER_HISTORIES_API" class="ch.qos.logback.core.rolling.RollingFileAppender">
   <file>${logpath}${logfilename}${CUSTOMER_HISTORIES_API_log}${logname}</file>
   <append>true</append>
   <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -99,9 +103,9 @@
     <charset>UTF-8</charset>
     <pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] %logger{0} - %msg%n</pattern>
   </encoder>
-</appender>
+</appender> -->
 
-<appender name="TGCARSCOM_API_021" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<!-- <appender name="TGCARSCOM_API_021" class="ch.qos.logback.core.rolling.RollingFileAppender">
 	<file>${logpath}${logfilename}${TGCARSCOM_API_021_log}${logname}</file>
 	<append>true</append>
 	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -112,9 +116,9 @@
 	  <charset>UTF-8</charset>
 	  <pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] %logger{0} - %msg%n</pattern>
 	</encoder>
-</appender>
+</appender> -->
 
-<appender name="CIRIUS_API_PIPELINE_CUSTOMER_NUMBER_RELATION" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<!-- <appender name="CIRIUS_API_PIPELINE_CUSTOMER_NUMBER_RELATION" class="ch.qos.logback.core.rolling.RollingFileAppender">
 	<file>${logpath}${logfilename}${CIRIUS_API_PIPELINE_CUSTOMER_NUMBER_RELATION_log}${logname}</file>
 	<append>true</append>
 	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -125,9 +129,9 @@
 	  <charset>UTF-8</charset>
 	  <pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] %logger{0} - %msg%n</pattern>
 	</encoder>
-</appender>
+</appender> -->
 
-<appender name="KHSN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<!-- <appender name="KHSN" class="ch.qos.logback.core.rolling.RollingFileAppender">
   <file>${logpath}${logfilename}${KHSN_log}${logname}</file>
   <append>true</append>
   <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -138,9 +142,9 @@
     <charset>UTF-8</charset>
     <pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] %logger{0} - %msg%n</pattern>
   </encoder>
-</appender>
+</appender> -->
 
-<appender name="PIPELINE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<!-- <appender name="PIPELINE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 	<file>${logpath}${logfilename}${PIPELINE_log}${logname}</file>
 	<append>true</append>
 	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -151,7 +155,7 @@
 	  <charset>UTF-8</charset>
 	  <pattern>%d{yyyy/MM/dd HH:mm:ss} [%level] [%thread] %logger{0} - %msg%n</pattern>
 	</encoder>
-</appender>
+</appender> -->
 
 	<root level="${LOG_LEVEL}">
 		<appender-ref ref="CONSOLE" />
