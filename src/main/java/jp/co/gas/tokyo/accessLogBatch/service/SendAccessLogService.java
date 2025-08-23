@@ -72,7 +72,7 @@ public class SendAccessLogService {
       // アクセスログ保存システムメンテナンスの場合
       if (isMaintenance()) {
         // 処理を終了
-        log.info("アクセスログ保存システムメンテナンスの為、ファイルを送信しませんでした。\nアクセスログ送信処理件数 成功：{}件, 失敗：件, 未処理：", 
+        log.info("アクセスログ保存システムメンテナンスの為、ファイルを送信しませんでした。アクセスログ送信処理件数 成功：{}件, 失敗：{}件, 未処理：{}件", 
           successCount, 
           failureCount, 
           (fileNameList.size() - successCount - failureCount));
@@ -106,7 +106,7 @@ public class SendAccessLogService {
             failureCount++;
 
             // 処理を終了し、次のファイル送信を実行
-            log.warn("アクセスログファイルの取得に失敗しました。ファイル名：{}", fileName, e);
+            log.warn("アクセスログファイルの取得に失敗しました。ファイル名：[{}]", fileName, e);
             continue;
           }
 
@@ -114,7 +114,7 @@ public class SendAccessLogService {
             // アクセスログ保存システムへ送信
             ftpService.setLocalPath(accessLogFile.getAbsolutePath());
             ftpService.put();
-            log.info("アクセスログ保存システム送信成功ファイル：[]", fileName);
+            log.info("アクセスログ保存システム送信成功ファイル：[{}]", fileName);
 
             // 送信成功時にログストレージ上のファイルを削除
             file.delete();
@@ -129,7 +129,7 @@ public class SendAccessLogService {
             accessLogFile.delete();
           }
         } else {
-          log.warn("アクセスログファイルが存在しません。ファイル名：{}", fileName);
+          log.warn("アクセスログファイルが存在しません。ファイル名：[{}]", fileName);
         }
       }
     }
@@ -162,7 +162,7 @@ public class SendAccessLogService {
             this.exec(fileNames, alssLogDir);
         }
     } else {
-        log.info("指定ディレクトリが存在しないか、ディレクトリではありません。{}", alssLogDir);
+        log.info("指定ディレクトリが存在しないか、ディレクトリではありません。[{}]", alssLogDir);
     }
   }
 
@@ -192,7 +192,7 @@ public class SendAccessLogService {
       // アクセスログ保存システムメンテナンスの場合
       if (isMaintenance()) {
         // 処理を終了
-        log.info("アクセスログ保存システムメンテナンスの為、ファイルを送信しませんでした。\nアクセスログ送信処理件数 成功：{}件, 失敗：件, 未処理：", 
+        log.info("アクセスログ保存システムメンテナンスの為、ファイルを送信しませんでした。アクセスログ送信処理件数 成功：{}件, 失敗：{}件, 未処理：{}件", 
           successCount, 
           failureCount, 
           (fileNameList.size() - successCount - failureCount));
@@ -220,13 +220,13 @@ public class SendAccessLogService {
           } catch (Exception e) {
             // 失敗カウント追加
             failureCount++;
-            log.warn("アクセスログ保存システム送信失敗ファイル：[{}], エラー：", fileName, e);
+            log.warn("アクセスログ保存システム送信失敗ファイル：[{}]", fileName, e);
           } finally {
             // ローカルファイルを削除
             // file.delete();
           }
         } else {
-          log.warn("アクセスログファイルが存在しません。ファイル名：{}", fileName);
+          log.warn("アクセスログファイルが存在しません。ファイル名：[{}]", fileName);
         }
       }
     }
