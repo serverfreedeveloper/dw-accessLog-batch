@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             p.ID,
             p.PDF_TYPE pdfType,
             p.UKTK_NO uktkNo,
+            p.DETAIL_UKTK_NO detailUktkNo,
             p.REMOTE_ADDRESS_IP remoteAddressIp,
             p.REC_REG_USER_ID recRegUserId,
             p.REC_REG_USER_NM recRegUserNm,
@@ -25,7 +26,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         INNER JOIN MTMR m
             ON p.MTMR_NO = m.MTMR_NO
         INNER JOIN DW_APPLICATION_DETAIL d
-            ON m.uktk_no = d.uktk_no
+            ON p.uktk_no = d.uktk_no
+            AND p.detail_uktk_no = d.detail_uktk_no
         WHERE
             p.LINKED_FLG = 0
             AND p.REC_REG_USER_ID IS NOT NULL
@@ -35,6 +37,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             p.ID,
             p.PDF_TYPE pdfType,
             p.UKTK_NO uktkNo,
+            p.DETAIL_UKTK_NO detailUktkNo,
             p.REMOTE_ADDRESS_IP remoteAddressIp,
             p.REC_REG_USER_ID recRegUserId,
             p.REC_REG_USER_NM recRegUserNm,
@@ -50,6 +53,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             PDF_HKK_LOG p
         INNER JOIN DW_APPLICATION_DETAIL d
             ON p.uktk_no = d.uktk_no
+            AND p.detail_uktk_no = d.detail_uktk_no
         WHERE
             p.LINKED_FLG = 0
             AND p.PDF_TYPE= '5'
