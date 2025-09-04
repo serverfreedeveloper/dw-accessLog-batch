@@ -19,6 +19,9 @@ public class PdfHkkLogData {
     /** 受付番号 */
     private String uktkNo;
 
+    /** 詳細受付番号 */
+    private String detailUktkNo;
+
     /** リモートアドレスIP */
     private String remoteAddressIp;
 
