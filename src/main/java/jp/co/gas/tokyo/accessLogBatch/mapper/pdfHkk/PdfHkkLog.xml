@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
             p.ID,
             p.PDF_TYPE pdfType,
+            p.UKTK_NO uktkNo,
             p.REMOTE_ADDRESS_IP remoteAddressIp,
             p.REC_REG_USER_ID recRegUserId,
             p.REC_REG_USER_NM recRegUserNm,
@@ -33,6 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
             p.ID,
             p.PDF_TYPE pdfType,
+            p.UKTK_NO uktkNo,
             p.REMOTE_ADDRESS_IP remoteAddressIp,
             p.REC_REG_USER_ID recRegUserId,
             p.REC_REG_USER_NM recRegUserNm,
@@ -63,7 +65,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         UPDATE
 			PDF_HKK_LOG
 		SET
-			LINKED_FLG = 1
+			LINKED_FLG = #{flg}
 		WHERE
 			ID = #{id}
     </update>

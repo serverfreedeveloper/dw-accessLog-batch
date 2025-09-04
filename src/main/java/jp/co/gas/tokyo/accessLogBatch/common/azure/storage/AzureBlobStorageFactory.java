@@ -1,6 +1,9 @@
 package jp.co.gas.tokyo.accessLogBatch.common.azure.storage;
 
 import org.springframework.stereotype.Component;
+
+import com.azure.core.credential.AccessToken;
+import com.azure.core.credential.TokenRequestContext;
 import com.azure.identity.DefaultAzureCredential;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.storage.blob.BlobContainerClient;
@@ -19,9 +22,10 @@ public class AzureBlobStorageFactory {
     // エンドポイントURI
     String endpointUri = "https://" + storageAccountName + ".blob.core.windows.net/";
 
-    log.info(storageAccountName);
-    log.info(containerName);
-    log.info(endpointUri);
+    log.info("storageAccountName: {}, containerName: {}, endpointUri: {}", 
+      storageAccountName, 
+      containerName, 
+      endpointUri);
 
     DefaultAzureCredential defaultCredential = new DefaultAzureCredentialBuilder().build();
     defaultCredential.getToken(null);

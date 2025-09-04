@@ -6,7 +6,7 @@
 
 	<groupId>jp.co.gas.tokyo.accessLogBatch</groupId>
 	<artifactId>dw-accessLog-batch</artifactId>
-	<version>0.0.4</version>
+	<version>1.0.0</version>
 
 	<name>accessLogBatch</name>
 	<description>Demo project for Spring Boot</description>
@@ -175,18 +175,6 @@
 			</properties>
 			<build>
 				<finalName>${project.artifactId}-${project.version}_DEV</finalName>
-			</build>
-		</profile>
-		<profile>
-			<id>tes</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<environmentProfile>tes</environmentProfile>
-			</properties>
-			<build>
-				<finalName>${project.artifactId}-${project.version}_TES</finalName>
 			</build>
 		</profile>
 		<profile>

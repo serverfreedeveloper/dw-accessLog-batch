@@ -16,12 +16,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 導管管理画面CSV出力時アクセスログ送信用Service
+ * 導管管理画面（ガス小工事）CSV出力時アクセスログ送信用Service
  */
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class DwMngSendLogService {
+public class DwSmallWorkMngSendLogService {
 
   /** ログ送信Service */
   private final SendAccessLogService sendAccessLogService;
@@ -37,13 +37,13 @@ public class DwMngSendLogService {
   @Value("${DW_STOR_NAME}")
   private String storageAccountName;
 
-  /** コンテナ名（導管管理画面） */
-  @Value("${DW_MNG_APP_NAME}")
+  /** コンテナ名（導管管理画面（ガス小工事）） */
+  @Value("${DW_SMALL_WORK_MNG_APP_NAME}")
   private String containerName;
 
   public void exec() {
 
-    log.info("==================== アクセスログ送信 DW_MNG 処理開始 ====================");
+    log.info("==================== アクセスログ送信 ガス小工事 処理開始 ====================");
 
     try {
 
@@ -67,9 +67,9 @@ public class DwMngSendLogService {
       sendAccessLogService.exec(fileNameList, containerClient, ALSS_LOG_DIR_DW_MNG);
 
     } catch (Exception e) {
-      log.warn("アクセスログ送信処理に失敗しました。", e);
+      log.warn("アクセスログ ガス小工事 送信処理に失敗しました。", e);
     } finally {
-      log.info("==================== アクセスログ送信 DW_MNG 処理終了 ====================");
+      log.info("==================== アクセスログ送信 ガス小工事 処理終了 ====================");
     }
   }
 }
