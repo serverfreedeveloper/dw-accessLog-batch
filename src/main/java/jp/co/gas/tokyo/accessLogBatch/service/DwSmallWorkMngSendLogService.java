@@ -1,14 +1,11 @@
 package jp.co.gas.tokyo.accessLogBatch.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.models.BlobItem;
 
 import jp.co.gas.tokyo.accessLogBatch.common.azure.storage.AzureBlobStorageFactory;
 
@@ -57,12 +54,15 @@ public class DwSmallWorkMngSendLogService {
         containerClient.getBlobContainerName());
 
       // アクセスログリスト取得
-      PagedIterable<BlobItem> blobList = containerClient.listBlobs();
-      List<String> fileNameList = new ArrayList<String>();
-      blobList.forEach(blob -> {
-        fileNameList.add(blob.getName());
-      });
+      // PagedIterable<BlobItem> blobList = containerClient.listBlobs();
+      // List<String> fileNameList = new ArrayList<String>();
+      // blobList.forEach(blob -> {
+      //   fileNameList.add(blob.getName());
+      // });
 
+      // ファイル一覧を取得
+      List<String> fileNameList = sendAccessLogService.getFileNames(containerClient);
+      
       // 送信処理実行
       sendAccessLogService.exec(fileNameList, containerClient, ALSS_LOG_DIR_DW_MNG);
 

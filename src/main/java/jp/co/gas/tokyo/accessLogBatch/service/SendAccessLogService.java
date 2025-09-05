@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,8 +13,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.BlobItem;
+
 import jp.co.gas.tokyo.accessLogBatch.common.ftp.FtpService;
 import jp.co.gas.tokyo.accessLogBatch.config.AlssFtpConfig;
 import jp.co.gas.tokyo.accessLogBatch.utilities.DateUtil;
@@ -241,6 +245,23 @@ public class SendAccessLogService {
     }
   }
 
+  /**
+   * コンテナ直下に存在するアクセスログファイルの一覧を取得
+   * @param containerClient
+   * @return ファイル名リスト
+   */
+  public List<String> getFileNames(BlobContainerClient containerClient) {
+      PagedIterable<BlobItem> blobList = containerClient.listBlobsByHierarchy("/");
+      List<String> fileNameList = new ArrayList<String>();
+      blobList.forEach(blob -> {
+        // サブフォルダでない場合
+        if (!blob.isPrefix()) {
+          fileNameList.add(blob.getName());
+        }
+      });
+
+      return fileNameList;
+  }
   /**
    * アクセスログ保存システムメンテナンス判定
    * TODO ただし、現状この処理は常にfalseになるため機能はしていない
