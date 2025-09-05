@@ -251,7 +251,7 @@ public class SendAccessLogService {
    * @return ファイル名リスト
    */
   public List<String> getFileNames(BlobContainerClient containerClient) {
-      PagedIterable<BlobItem> blobList = containerClient.listBlobsByHierarchy("/");
+      PagedIterable<BlobItem> blobList = containerClient.listBlobsByHierarchy("");
       List<String> fileNameList = new ArrayList<String>();
       blobList.forEach(blob -> {
         // サブフォルダでない場合
